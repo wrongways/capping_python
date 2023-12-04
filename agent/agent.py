@@ -1,5 +1,7 @@
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from threading import Thread
+
 import shlex
 import subprocess
 import time
@@ -70,6 +72,12 @@ def hw_info():
        f: DMI_PATH.joinpath(f).read_text().strip() for f in DMI_FILES
     }
 
+def run_firestarter(runtime_secs, load_pct, n_threads):
+    assert load_pct > 0 and load_pct <= 100
+    args = f"--timesout {runtime_secs} --load {load_pct} --threads {n_threads}"
+    command_line = f"{self.firestarter_path} {args}"
+    run_command(command_line)
+
 
 class CappingAgent(Flask):
     def __init__(self):
@@ -88,6 +96,11 @@ class CappingAgent(Flask):
         max_uj_path = rapl_path.joinpath(MAX_ENERGY_PATH)
         self.max_uj = int(max_uj_path.read_text().strip())
         assert self.max_uj is not None and (self.max_uj > 0)
+
+        # use spawn as the mulitprocess start method
+
+        self.firestarter_path = "/home_nfs/wainj/local/bin/firestarter"
+
 
     def time(self):
         now = datetime.now().astimezone().replace(microsecond=0).isoformat()
@@ -137,6 +150,14 @@ class CappingAgent(Flask):
 
 
     def firestarter(self):
+        load_pct = request.args["load"]
+        timeout = request.args["timeout"]
+        n_threads = request.args["threads"]
+
+        t = Thread(target=run_firestarter, args=[timeout, load_pct, n_threads])
+        t.start()
+
+
         return jsonify(request.args)
 
 
