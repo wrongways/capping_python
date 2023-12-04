@@ -72,10 +72,10 @@ def hw_info():
        f: DMI_PATH.joinpath(f).read_text().strip() for f in DMI_FILES
     }
 
-def run_firestarter(runtime_secs, load_pct, n_threads):
+def run_firestarter(path, runtime_secs, load_pct, n_threads):
     assert load_pct > 0 and load_pct <= 100
     args = f"--timesout {runtime_secs} --load {load_pct} --threads {n_threads} --quiet"
-    command_line = f"{self.firestarter_path} {args}"
+    command_line = f"{path} {args}"
     rc = run_command(command_line)
     print(f"firestarter: stdout: {rc.stdout}, stderr: {rc.stderr}")
 
@@ -157,7 +157,10 @@ class CappingAgent(Flask):
         n_threads = params.get("threads", 0)
 
 
-        t = Thread(target=run_firestarter, args=[timeout, load_pct, n_threads])
+        t = Thread(
+            target=run_firestarter,
+            args=[self.firestarter_pathtimeout, load_pct, n_threads]
+        )
         t.start()
 
 
