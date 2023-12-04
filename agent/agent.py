@@ -74,9 +74,10 @@ def hw_info():
 
 def run_firestarter(runtime_secs, load_pct, n_threads):
     assert load_pct > 0 and load_pct <= 100
-    args = f"--timesout {runtime_secs} --load {load_pct} --threads {n_threads}"
+    args = f"--timesout {runtime_secs} --load {load_pct} --threads {n_threads} --quiet"
     command_line = f"{self.firestarter_path} {args}"
-    run_command(command_line)
+    rc = run_command(command_line)
+    print(f"firestarter: stdout: {rc.stdout}, stderr: {rc.stderr}")
 
 
 class CappingAgent(Flask):
