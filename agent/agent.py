@@ -111,7 +111,7 @@ class CappingAgent(Flask):
 
         # collect the initial values and timestamps for each socket/package
         start_values = {path: {
-                'energy_uj': int(path.join_path('energy_uj').read_text().strip()),
+                'energy_uj': int(path.joinpath('energy_uj').read_text().strip()),
                 'timestamp': time.time_ns(),
             } for path, name in self.sockets.items()
         }
@@ -125,7 +125,7 @@ class CappingAgent(Flask):
             start_timestamp = start_values[path]['timestamp']
 
             # read current energy consumption
-            energy_uj = int(path.join_path('energy_uj').read_text().strip())
+            energy_uj = int(path.joinpath('energy_uj').read_text().strip())
             timestamp = time.time_ns()
 
             # check for counter wrap-around
@@ -152,17 +152,16 @@ class CappingAgent(Flask):
 
     def firestarter(self):
         params = request.json
-        timeout = params.get("timeout", 10)
-        load_pct = params.get("load", 100)
-        n_threads = params.get("threads", 0)
-
-
         t = Thread(
             target=run_firestarter,
-            args=[self.firestarter_path, timeout, load_pct, n_threads]
+            args=[
+                self.firestarter_path,
+                params.get("timeout", 10),
+                params.get("load", 100),
+                params.get("threads", 0)
+            ]
         )
         t.start()
-
 
         return jsonify({}), HTTP_202_ACCEPTED
 
