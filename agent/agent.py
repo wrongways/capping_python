@@ -4,7 +4,7 @@ import shlex
 import subprocess
 import time
 
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 
 
 RAPL_PATH = "/sys/devices/virtual/powercap/intel-rapl/"
@@ -78,6 +78,7 @@ class CappingAgent(Flask):
         self.add_url_rule("/", view_func=self.time)
         self.add_url_rule("/rapl_stats", view_func=self.rapl_stats)
         self.add_url_rule("/system_info", view_func=self.system_info)
+        self.add_url_rule("/firestarter", view_func=self.firestarter, methods=["POST"])
 
         rapl_path = Path(RAPL_PATH)
         rapl_packages = rapl_path.glob("intel-rapl:[0-9]*")
@@ -133,6 +134,10 @@ class CappingAgent(Flask):
             hostname() |
             os_name()
         )
+
+
+    def firestarter(self):
+        return jsonify(request.args)
 
 
 if __name__ == "__main__":
