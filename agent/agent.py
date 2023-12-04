@@ -128,9 +128,9 @@ class CappingAgent(Flask):
 
     def system_info(self):
         return jsonify(
-            hw_info() +
-            cpu_info() +
-            hostname() +
+            hw_info()  |
+            cpu_info() |
+            hostname() |
             os_name()
         )
 
