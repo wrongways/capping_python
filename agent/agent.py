@@ -6,11 +6,12 @@ import shlex
 import subprocess
 import time
 
-from flask import Flask, request, jsonify, status
+from flask import Flask, request, jsonify
 
 
 RAPL_PATH = "/sys/devices/virtual/powercap/intel-rapl/"
 MAX_ENERGY_PATH = "intel-rapl:0/max_energy_range_uj"
+HTTP_202_ACCEPTED = 202
 
 
 def run_command(command):
@@ -164,7 +165,7 @@ class CappingAgent(Flask):
         t.start()
 
 
-        return jsonify({}), status.HTTP_202_ACCEPTED
+        return jsonify({}), HTTP_202_ACCEPTED
 
 
 if __name__ == "__main__":
