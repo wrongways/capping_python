@@ -159,7 +159,7 @@ class CappingAgent(Flask):
 
         t = Thread(
             target=run_firestarter,
-            args=[self.firestarter_pathtimeout, load_pct, n_threads]
+            args=[self.firestarter_path, timeout, load_pct, n_threads]
         )
         t.start()
 
