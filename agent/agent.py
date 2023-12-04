@@ -136,8 +136,11 @@ class CappingAgent(Flask):
 
             time_delta = timestamp - start_timestamp
             power_watts = energy_delta_uj / time_delta / 1_000_000
-
             package_powers[name] = power_watts
+
+            print(f"{time_delta=}")
+            print(f"{energy_delta_uj=}")
+            print(f"{power_watts=}")
 
         return jsonify(package_powers)
 
