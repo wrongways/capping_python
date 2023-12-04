@@ -27,11 +27,11 @@ def os_name():
     os_data = Path("/etc/os-release").read_text().splitlines()
     os_data = {d[0]: d[1] for d in [e.strip().split('=') for e in os_data] if len(d) == 2}
     os_name = os_data.get("PRETTY_NAME") or f"{os_data.get('NAME')} {os_data.get('VERSION')}"
-    return {"os_name": os_name}
+    return {"os_name": os_name.strip('"')}
 
 
 def hostname():
-    return {"hostname": run_command("hostname -s").stdout}
+    return {"hostname": run_command("hostname -s").stdout.strip()}
 
 
 def cpu_info():
@@ -51,7 +51,7 @@ def cpu_info():
     cpu_data = run_command("lscpu").stdout
     # Transform each line into dictionary entry, split on colon ':'
     cpu_data = {d[0]: d[1] for d in [line.strip().split(":") for line in cpu_data.splitlines()]}
-    return {k.lower().replace(" ", "_"): cpu_data[k] for k in CPU_KEYS}
+    return {k.lower().replace(" ", "_"): cpu_data[k].strip() for k in CPU_KEYS}
 
 
 def hw_info():
