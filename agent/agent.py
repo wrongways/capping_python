@@ -116,7 +116,7 @@ class CappingAgent(Flask):
             } for path, name in self.sockets.items()
         }
         # wait a while for the counters to increment
-        time.sleep(0.25)
+        time.sleep(1)
 
         # calculate the power of each socket
         package_powers = {}
