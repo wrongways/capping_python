@@ -81,7 +81,7 @@ class CappingAgent(Flask):
 
         rapl_path = Path(RAPL_PATH)
         rapl_packages = rapl_path.glob("intel-rapl:[0-9]*")
-        self.sockets = {p: p.join_path("name").read_text().strip() for p in rapl_packages}
+        self.sockets = {p: p.joinpath("name").read_text().strip() for p in rapl_packages}
 
         # ASSUMPTION: all sockets have the same max_energy_range_uj value
         max_uj_path = rapl_path.joinpath(MAX_ENERGY_PATH)
