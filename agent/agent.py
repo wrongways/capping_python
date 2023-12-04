@@ -74,7 +74,7 @@ def hw_info():
 
 def run_firestarter(path, runtime_secs, load_pct, n_threads):
     assert load_pct > 0 and load_pct <= 100
-    args = f"--timesout {runtime_secs} --load {load_pct} --threads {n_threads} --quiet"
+    args = f"--timeout {runtime_secs} --load {load_pct} --threads {n_threads} --quiet"
     command_line = f"{path} {args}"
     rc = run_command(command_line)
     print(f"firestarter: stdout: {rc.stdout}, stderr: {rc.stderr}")
