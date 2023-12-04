@@ -138,7 +138,7 @@ class CappingAgent(Flask):
             power_watts = energy_delta_uj / time_delta_ns * 1000
             package_powers[name] = power_watts
 
-            print(f"{time_delta=}")
+            print(f"{time_delta_ns=}")
             print(f"{energy_delta_uj=}")
             print(f"{power_watts=}")
 
