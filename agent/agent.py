@@ -134,8 +134,8 @@ class CappingAgent(Flask):
                 else self.max_uj - start_energy_uj + energy_uj
             )
 
-            time_delta = timestamp - start_timestamp
-            power_watts = energy_delta_uj / time_delta / 1_000_000
+            time_delta_ns = timestamp - start_timestamp
+            power_watts = energy_delta_uj / time_delta_ns * 1000
             package_powers[name] = power_watts
 
             print(f"{time_delta=}")
