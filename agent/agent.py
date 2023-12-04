@@ -151,12 +151,11 @@ class CappingAgent(Flask):
 
 
     def firestarter(self):
-        load_pct = request.args["load"]
-        timeout = request.args["timeout"]
-        n_threads = request.args["threads"]
+        params = request.json
+        return jsonify(params)
 
-        t = Thread(target=run_firestarter, args=[timeout, load_pct, n_threads])
-        t.start()
+        # t = Thread(target=run_firestarter, args=[timeout, load_pct, n_threads])
+        # t.start()
 
 
         return jsonify(request.args)
