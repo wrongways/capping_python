@@ -7,20 +7,39 @@ class IPMI:
         self.username = username
         self.password = password
         self.ipmitool_path = ipmitool_path
+        self.ipmi_prefix = f"{ipmitool_path} -H {hostname} -U {username} -P {password}"
 
-    def get_capping_state(self):
-        ipmi_cmd = ipmi_cmd = f"{self.ipmitool_path} dcmi power get limit"
+    def run_ipmi_command(self, command):
+        ipmi_cmd = f"{self.ipmi_prefix} {command}"
         result = run_command(ipmi_cmd)
-        if result.returncode == 0 and result.stderr is None:
-            lines = result.stdout.splitlines()
-            capping_fields = [line.split(":") for line in lines]
-            capping_dict = {f[0]: f[1] for f in capping_fields if len(f) == 2}
+        if result["OK"]:
+            ipmi_dict = None
+            if result.stdout is not None:
+                ipmi_fields = [line.split(":") for line in result.stdout.splitlines()]
+                impi_dict = {f[0]: f[1] for f in capping_fields if len(f) == 2}
 
-            print(f"{capping_dict=}")
+                print(f"{ipmi_dict=}")
 
+            return {
+                "OK": True,
+                "ipmi_dict": ipmi_dict
+            }
+        else:
+            return {
+                "OK": False,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+                "args": result.args
+            }
+
+
+    def get_capping_level(self):
+        ipmi_cmd = "dcmi power get limit"
+        result = run_ipmi_command(ipmi_cmd)
+        if result["OK"]:
             capping_limit = (
-                None if capping_dict["Current Limit State"] == "No Active Power Limit"
-                else int(capping_dict["Power Limit"].split()[0])
+                None if result["ipmi_dict"]["Current Limit State"] == "No Active Power Limit"
+                else float(result["ipmi_dict"]["Power Limit"].split()[0])
             )
 
             return {
@@ -29,35 +48,26 @@ class IPMI:
             }
 
         else:
-            return {
-                "OK": False,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "args": result.args
-            }
+            return result
 
     def set_capping_level(self, cap_level):
+        result = None
         if cap_level:
-            ipmi_cmd = f"{self.ipmitool_path} dcmi power set_limit limit {cap_level}"
-            result = run_command(ipmi_cmd)
-            if result.returncode == 0 and result.stderr is None:
-                ipmi_cmd = f"{self.ipmitool_path} dcmi power activate"
-                result = run_command(ipmi_cmd)
+            ipmi_cmd = f"dcmi power set_limit limit {cap_level}"
+            result = run_ipmi_command(ipmi_cmd)
+            if result["OK"]:
+                ipmi_cmd = "dcmi power activate"
+                result = run_ipmi_command(ipmi_cmd)
         else:
             ipmi_cmd = f"{self.ipmitool_path} dcmi power deactivate"
-            result = run_command(ipmi_cmd)
+            result = run_ipmi_command(ipmi_cmd)
 
-        if result.returncode == 0 and result.stderr is None:
+        if result["OK"]:
             return {
                 "OK": True
             }
         else:
-            return {
-                "OK": False,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "args": result.args
-            }
+            return result
 
     def get_current_power(self):
         ipmi_cmd = f"{self.ipmitool_path} dcmi power reading"
