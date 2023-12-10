@@ -14,7 +14,7 @@ class Redfish:
         self.bmc.login(auth="session")
         self.set_motherboard_path()
 
-    def set_board_path(self):
+    def set_motherboard_path(self):
         self.motherboard_path = None
         chassis_path = self.hosturl + REDFISH_BASE + "/Chassis"
         response = self.bmc.get(chassis_path)
@@ -26,7 +26,6 @@ class Redfish:
                 if ending.lower() in {"motherboard", "self"}:
                     self.motherboard_path = self.hosturl + path
                     break
-
 
     def get_capping_level(self):
         capping_limit_path = self.motherboard_path + "Power#/PowerControl"
@@ -58,9 +57,36 @@ class Redfish:
             "args": capping_limit_path
         }
 
-
     def set_capping_level(self, cap_level):
-        pass
+        power_path = self.motherboard_path + "/Power"
+
+        if cap_level is None:
+            cap_level = "null"
+
+        cap_content = {
+            "PowerControl": [
+                {
+                    "PowerLimit": {
+                        "LimitInWatts": cap_level
+                    }
+                }
+            ]
+        }
+
+        # POST the request; the redfish api adds the content-type header
+        response = self.bmc.post(power_path, body=cap_content)
+        if response.status = HTTP_OK_200:
+            return {
+                "OK": True
+            }
+        else:
+            return {
+                "OK": False,
+                "stdout": response.status,
+                "stderr": response.text,
+                "args": power_path
+            }
+
 
     def get_current_power(self):
         power_path = self.motherboard_path + "/Power"
